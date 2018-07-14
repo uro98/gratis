@@ -1,6 +1,7 @@
 import config
 import praw
 import time
+import re
 from collections import deque
 
 
@@ -52,12 +53,12 @@ def process_deal(deal, seen_deal_ids, new_free_deals):
 
 def is_free_deal(deal):
     """Return True if the deal title contains free as a word or 100%."""
-    # TODO: Match free with no letters around it with regex
-    search_keywords = ['free', '100%']
-    lowercase_title = deal.title.lower()
-    for keyword in search_keywords:
-        if keyword in lowercase_title:
-            return True
+    # Match 'free' as a complete word (case insensitive)
+    match_free = re.search(r'\bfree\b', deal.title, re.IGNORECASE)
+    # Match '100%' or '100 %'
+    match_100 = re.search('100 *%', deal.title)
+    if match_free or match_100:
+        return True
 
 
 def sleep_until_next_posting_time():
