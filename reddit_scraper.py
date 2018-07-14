@@ -2,7 +2,7 @@ import config
 import praw
 import time
 import re
-from collections import deque
+from collections import deque, namedtuple
 
 
 def main():
@@ -64,15 +64,29 @@ def is_free_deal(deal):
 def sleep_until_next_posting_time():
     """Calculate the time until the next posting time and sleep for that duration."""
     current_time = time.localtime()
-    extra_minutes_to_sleep = 60 - current_time.tm_min
-    hours_to_sleep = calculate_hours_to_sleep(current_time)
-    print("Sleeping for "
-          + str(hours_to_sleep) + " hours and "
-          + str(extra_minutes_to_sleep) + " minutes.")
-    time.sleep(hours_to_sleep * 60 * 60 + extra_minutes_to_sleep * 60)
+    print_current_time(current_time)
+    time_to_sleep = calculate_time_to_sleep(current_time)
+    print_time_to_sleep(time_to_sleep)
+    sleep(time_to_sleep)
 
 
-def calculate_hours_to_sleep(current_time):
+def print_current_time(current_time):
+    """Print the current time."""
+    print("Current time: " + str(current_time.tm_hour)
+          + ":" + str(current_time.tm_min)
+          + ":" + str(current_time.tm_sec))
+
+
+def calculate_time_to_sleep(current_time):
+    """Return the amount of time to sleep for as a tuple."""
+    extra_seconds_to_sleep = 60 - current_time.tm_sec
+    extra_minutes_to_sleep = 60 - current_time.tm_min - 1
+    hours_to_sleep = calculate_hours(current_time)
+    Time = namedtuple('Time', ['hour', 'min', 'sec'])
+    return Time(hours_to_sleep, extra_minutes_to_sleep, extra_seconds_to_sleep)
+
+
+def calculate_hours(current_time):
     """Return the number of full hours until the next posting time."""
     if current_time.tm_hour < 8:
         return 8 - current_time.tm_hour - 1
@@ -80,6 +94,21 @@ def calculate_hours_to_sleep(current_time):
         return 20 - current_time.tm_hour - 1
     else:
         return (24 - current_time.tm_hour) + 7
+
+
+def print_time_to_sleep(time_to_sleep):
+    """Print the amount of time to sleep for."""
+    print("Sleeping for "
+          + str(time_to_sleep.hour) + " hours, "
+          + str(time_to_sleep.min) + " minutes and "
+          + str(time_to_sleep.sec) + " seconds.")
+
+
+def sleep(time_to_sleep):
+    """Sleep for the given amount of time."""
+    time.sleep(time_to_sleep.hour * 60 * 60
+               + time_to_sleep.min * 60
+               + time_to_sleep.sec)
 
 
 if __name__ == '__main__':
