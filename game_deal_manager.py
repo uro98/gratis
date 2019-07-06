@@ -35,7 +35,6 @@ class GameDealManager:
 
 
 if __name__ == '__main__':
-    print('starting')
     reddit = RedditScraper()
     manager = GameDealManager(reddit)
     deals = manager.find_deals()
