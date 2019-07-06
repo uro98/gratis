@@ -3,12 +3,13 @@ import discord
 from discord.ext import commands
 import asyncio
 import logging
-from reddit_scraper import *
+from reddit_scraper import RedditScraper
+from game_deal_manager import GameDealManager
 
 logging.basicConfig(level=logging.INFO)
 client = discord.Client()
 
-#TODO: redditScraper class, get channel id, fix sleep time, refactor, search function
+#TODO: get channel id, fix sleep time, refactor, search function, input validation
 
 def main():
     client.loop.create_task(scrape_reddit())
@@ -18,16 +19,15 @@ def main():
 async def scrape_reddit():
     await client.wait_until_ready()
 
-    game_deals_sub = get_subreddit('GameDeals')
-    search_limit = 30
-    seen_deal_ids = deque(maxlen=search_limit)
+    reddit = RedditScraper()
+    manager = GameDealManager(reddit)
 
-    channel = discord.Object(DISCORD_CHANNEL_ID)
+    channel = discord.Object(config.DISCORD_CHANNEL_ID)
     while not client.is_closed:
         if await is_8am_or_8pm():
-            new_free_deals = find_deals(game_deals_sub, seen_deal_ids, search_limit)
+            new_free_deals = manager.find_deals()
             if new_free_deals:
-                embed = discord.Embed(title='Free Games Alert!', description='New deals with free stuff on [/r/GameDeals](https://www.reddit.com/r/GameDeals/)', color=0x2df228)
+                embed = discord.Embed(title='Freebie Alert!', description='New deals with free stuff on [/r/GameDeals](https://www.reddit.com/r/GameDeals/)', color=0x2df228)
                 for deal in new_free_deals:
                     embed.add_field(name=deal.title, value=deal.url, inline=False)
                 await client.send_message(channel, embed=embed)
