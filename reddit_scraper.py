@@ -13,5 +13,6 @@ class RedditScraper:
         self.reddit.read_only = True
 
     def get_new_posts_in_sub(self, num_of_posts, sub_name):
+        """Get the specified number of new posts from the subreddit"""
         sub = self.reddit.subreddit(sub_name)
         return sub.new(limit=num_of_posts)
