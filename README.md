@@ -1,6 +1,6 @@
 # Gratis
 
-This is a Discord bot that scrapes the [r/GameDeals](https://www.reddit.com/r/GameDeals/) subreddit for free deals.
+This is a Discord bot that scrapes the [r/GameDeals](https://www.reddit.com/r/GameDeals/) subreddit for free deals. It sends new deals to channels called "free-games" at 6am and 6pm every day.
 
 ## Built With
 
